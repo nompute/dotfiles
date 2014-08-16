@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# dot
+#
+# `dot` handles installation, updates, things like that. Run it periodically
+# to make sure you're on the latest and greatest.
+
+if [ "$(uname -s)" == "Darwin" ]; then
+    # Set OS X defaults
+    $ZSH/osx/set-defaults.sh
+
+    # Upgrade homebrew
+    brew update
+
+    # Install homebrew packages
+    if [ -f "$ZSH/homebrew/install.sh" ]; then
+        $ZSH/homebrew/install.sh 2>&1
+    fi
+elif [ -f /etc/debian_version ]; then
+    apt-get update
+fi

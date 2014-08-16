@@ -1,0 +1,21 @@
+#!/bin/sh
+# updateme
+#
+# Update all the things, adapted from 'dot' from holman/dotfiles/bin/dot
+
+# Set OS X defaults
+$DOTFILES_ROOT/osx/set-defaults.sh
+
+if test ! $(which brew); then
+    echo "  Installing Homebrew for you."
+    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)" > /tmp/homebrew-install.log
+
+    brew install grc coreutils spark vim
+else
+    # Upgrade homebrew
+    brew update
+fi
+
+# Update oh-my-zsh
+ZSH=$HOME/.oh-my-zsh
+/usr/bin/env ZSH=$ZSH /bin/sh $ZSH/tools/upgrade.sh

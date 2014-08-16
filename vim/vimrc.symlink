@@ -1,0 +1,148 @@
+set nocompatible
+
+" Required for vundle
+filetype off
+
+set rtp+=~/.vim/bundle/Vundle.vim/
+call vundle#begin()
+
+" let Vundle manage Vundle
+" required!
+Bundle 'gmarik/Vundle.vim'
+
+" User-Configured bundles
+Bundle 'kien/ctrlp.vim'
+Bundle 'tpope/vim-rails'
+Bundle 'tpope/vim-rake'
+Bundle 'tpope/vim-fugitive'
+Bundle 'tpope/vim-surround'
+Bundle 'tpope/vim-endwise'
+Bundle 'tpope/vim-markdown'
+Bundle 'tpope/vim-haml'
+Bundle 'scrooloose/nerdcommenter'
+Bundle 'scrooloose/syntastic'
+Bundle 'ervandew/supertab'
+Bundle 'mileszs/ack.vim'
+Bundle 'vim-scripts/closetag.vim'
+Bundle 'Align'
+Bundle 'snipMate'
+Bundle 'Valloric/YouCompleteMe'
+Bundle 'altercation/vim-colors-solarized'
+Bundle 'derekwyatt/vim-scala'
+Bundle 'fatih/vim-go'
+
+" Required for vundle
+call vundle#end()
+filetype plugin indent on
+
+" Making things pretty
+set t_Co=256
+syntax enable
+set background=dark
+colorscheme solarized
+
+"----------------"
+" General Config "
+"----------------"
+set encoding=utf-8
+filetype on
+set shiftwidth=4
+set tabstop=4
+set expandtab
+set autoindent
+set smartindent
+set smarttab
+set showmatch
+set nowrap
+" Sexy thing for showing trailing whitespace + hard tabs
+set list listchars=tab:··,trail:·
+
+" Set up nice copy/paste integration for the mac
+if has('mac')
+    set clipboard=unnamed
+endif
+
+set nu
+set ruler
+" Enable mouse stuff (I think this works in Terminal)
+set mouse=a
+
+" Tab completion
+set wildmode=list:longest,list:full
+set wildignore+=*.o,*.obj,.git,*.rbc,*.so,*.swp,*.zip,*.exe,*.class,*.pyc
+
+" Searching
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+
+" Directories for swp files (centralized)
+set backupdir=~/.vim/backup
+set directory=~/.vim/backup
+
+" Function for removing trailing whitespace
+function! StripTrailingWhite()
+    let l:winview = winsaveview()
+    silent! %s/\s\+$//
+    call winrestview(l:winview)
+endfunction
+
+" Remove trailing whitespace from files on save
+autocmd FileType c,cpp,java,groovy,python,rb,gsp autocmd BufWritePre <buffer> :call setline(1,map(getline(1,"$"),'substitute(v:val,"\\s\\+$","","")'))
+
+"------------------------"
+" FileType Configuration "
+"------------------------"
+
+" Global wildcard ignores
+set wildignore+=*.o,*.obj,.git,*.pyc,*.class,*.log*
+
+" make uses real tabs
+au FileType make set noexpandtab
+
+" Thorfile, Rakefile and Gemfile are Ruby
+au BufRead,BufNewFile {Gemfile,Rakefile,Thorfile,config.ru} set ft=ruby
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" load the plugin and indent settings for the detected filetype
+filetype plugin indent on
+
+" Set indents for groovy
+au FileType groovy set shiftwidth=4
+au FileType groovy set tabstop=4
+au FileType groovy set softtabstop=4
+
+" Smaller default indents for a few things
+au FileType ruby,mako,javascript,html,yaml set tabstop=2
+au FileType ruby,mako,javascript,html,yaml set softtabstop=2
+au FileType ruby,mako,javascript,html,yaml set shiftwidth=2
+
+" Set up format=flowed for mail
+au FileType mail setlocal fo+=aw
+
+"----------------"
+" Plugin Configs "
+"----------------"
+
+" Command-Shift-F for Ack
+map <D-F> :Ack<space>
+
+" Command-/ to toggle comments
+map <D-/> <plug>NERDCommenterToggle<CR>
+
+" Syntastic
+let g:syntastic_enable_signs=1
+" Passively check xml files
+let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['xml', 'eruby'] }
+
+" Ctrl-P
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+map <Leader>f :CtrlP<CR>
+let g:ctrlp_switch_buffer = 'tT'
+
+" vim-go
+let g:go_disable_autoinstall = 1 " disable auto-install of vim binaries
