@@ -4,8 +4,7 @@ else
   export PS1='%3~$(git_info_for_prompt)%# '
 fi
 
-export LSCOLORS="exfxcxdxbxegedabagacad"
-# export LSCOLORS="gxfxcxdxbxegedabagacad" # non-bold colors
+export LSCOLORS="gxfxcxdxbxegedabagacad" # non-bold colors
 export CLICOLOR=true
 
 fpath=($ZSH/functions $fpath)
