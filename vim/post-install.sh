@@ -1,1 +1,3 @@
-vim -c 'BundleInstall' -c 'qa!'
+#!/bin/bash
+
+vim +PluginInstall +qall

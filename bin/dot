@@ -19,3 +19,6 @@ if [ "$(uname -s)" == "Darwin" ]; then
 elif [ -f /etc/debian_version ]; then
     apt-get update
 fi
+
+# Update vim plugins
+vim +PluginInstall +qall

@@ -162,7 +162,7 @@ then
   else
     fail "error installing dependencies"
   fi
-  install_apps
+  #install_apps
 fi
 
 install_deps
