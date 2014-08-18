@@ -1,5 +1,6 @@
 if [[ -n $SSH_CONNECTION ]]; then
   export PS1='%m:%3~$(git_info_for_prompt)%# '
+  setopt NO_HUP # don't allow ctrl-d to exit in ssh envs
 else
   export PS1='%3~$(git_info_for_prompt)%# '
 fi
@@ -16,7 +17,6 @@ HISTSIZE=10000
 SAVEHIST=10000
 
 setopt NO_BG_NICE # don't nice background tasks
-setopt NO_HUP
 setopt NO_LIST_BEEP
 setopt LOCAL_OPTIONS # allow functions to have local options
 setopt LOCAL_TRAPS # allow functions to have local traps
@@ -44,6 +44,9 @@ setopt auto_pushd               # make cd push old dir in dir stack
 setopt pushd_ignore_dups        # no duplicates in dir stack
 setopt pushd_silent             # no dir stack after pushd or popd
 setopt pushd_to_home            # `pushd` = `pushd $HOME`
+
+# force emacs-style shell keybindings (workaround for tmux)
+bindkey -e
 
 #bindkey '^[^[[D' backward-word
 #bindkey '^[^[[C' forward-word
