@@ -3,3 +3,5 @@
 [user]
     email = mike@nompute.com
     name  = Michael Lai
+[push]
+	default = simple
