@@ -74,6 +74,14 @@ rbenv_version_status() {
   [ "$(rbenv global)" != "$ver" ] && echo "[$ver]"
 }
 
+prompt_hostname() {
+    if [[ -n $SSH_CONNECTION ]]; then
+        echo "%{$fg[white]%}%m::%{$reset_color%} "
+    else
+        echo ""
+    fi
+}
+
 local ret_status="%(?:%{$fg_bold[green]%}$:%{$fg_bold[red]%}$)"
 local timeval="%{$fg[blue]%}[%D{%H:%M:%S}]%{$reset_color%}"
-PROMPT=$'\n$(rb_prompt)in $(directory_name) $(git_dirty)$(need_push)\n${timeval} %B${ret_status}%b '
+PROMPT=$'\n$(prompt_hostname)$(rb_prompt)in $(directory_name) $(git_dirty)$(need_push)\n${timeval} %B${ret_status}%b '
