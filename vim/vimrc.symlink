@@ -143,6 +143,3 @@ let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
 map <Leader>f :CtrlP<CR>
 let g:ctrlp_switch_buffer = 'tT'
-
-" vim-go
-let g:go_disable_autoinstall = 1 " disable auto-install of vim binaries
