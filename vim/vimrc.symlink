@@ -30,6 +30,16 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'derekwyatt/vim-scala'
 Plugin 'fatih/vim-go'
+Plugin 'godlygeek/tabular'
+Plugin 'majutsushi/tagbar'
+Plugin 'Shougo/vimproc.vim'
+
+" Haskell
+Plugin 'neovimhaskell/haskell-vim'
+Plugin 'enomsg/vim-haskellConcealPlus'
+Plugin 'eagletmt/ghcmod-vim'
+Plugin 'eagletmt/neco-ghc'
+Plugin 'Twinside/vim-hoogle'
 
 " Required for vundle
 call vundle#end()
@@ -91,6 +101,12 @@ endfunction
 " Remove trailing whitespace from files on save
 autocmd FileType c,cpp,java,groovy,python,rb,gsp autocmd BufWritePre <buffer> :call setline(1,map(getline(1,"$"),'substitute(v:val,"\\s\\+$","","")'))
 
+" Use par for prettier line formatting
+set formatprg="PARINIT='rTbgqR B=.,?_A_a Q=_s>|' par\ -w72"
+
+" Find custom built ghc-mod, codex etc
+let $PATH = $PATH . ':' . expand("~/.cabal/bin")
+
 "------------------------"
 " FileType Configuration "
 "------------------------"
@@ -123,6 +139,22 @@ au FileType ruby,mako,javascript,html,yaml set shiftwidth=2
 " Set up format=flowed for mail
 au FileType mail setlocal fo+=aw
 
+" Haskell customizations
+augroup haskell
+  autocmd!
+  autocmd FileType haskell map <silent> <leader><cr> :noh<cr>:GhcModTypeClear<cr>:SyntasticReset<cr>
+  autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
+augroup END
+
+" Use stylish haskell instead of par for haskell buffers
+autocmd FileType haskell let &formatprg="stylish-haskell"
+
+" Pretty unicode haskell symbols
+let g:haskell_conceal_wide = 1
+let g:haskell_conceal_enumerations = 1
+let hscoptions="𝐒𝐓𝐄𝐌xRtB𝔻w"
+
+
 "----------------"
 " Plugin Configs "
 "----------------"
@@ -143,3 +175,143 @@ let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
 map <Leader>f :CtrlP<CR>
 let g:ctrlp_switch_buffer = 'tT'
+
+" SuperTab - Use buffer words as default tab completion
+let g:SuperTabDefaultCompletionType = '<c-x><c-p>'
+
+" Haskell Interrogation {{{
+
+set completeopt+=longest
+
+" But provide (neco-ghc) omnicompletion
+if has("gui_running")
+  imap <c-space> <c-r>=SuperTabAlternateCompletion("\<lt>c-x>\<lt>c-o>")<cr>
+else " no gui
+  if has("unix")
+    inoremap <Nul> <c-r>=SuperTabAlternateCompletion("\<lt>c-x>\<lt>c-o>")<cr>
+  endif
+endif
+
+" Show types in completion suggestions
+let g:necoghc_enable_detailed_browse = 1
+
+" Type of expression under cursor
+nmap <silent> <leader>ht :GhcModType<CR>
+" Insert type of expression under cursor
+nmap <silent> <leader>hT :GhcModTypeInsert<CR>
+" GHC errors and warnings
+nmap <silent> <leader>hc :SyntasticCheck ghc_mod<CR>
+
+" Resolves ghcmod base directory
+au FileType haskell let g:ghcmod_use_basedir = getcwd()
+
+" Fix path issues from vim.wikia.com/wiki/Set_working_directory_to_the_current_file
+let s:default_path = escape(&path, '\ ') " store default value of 'path'
+" Always add the current file's directory to the path and tags list if not
+" already there. Add it to the beginning to speed up searches.
+autocmd BufRead *
+      \ let s:tempPath=escape(escape(expand("%:p:h"), ' '), '\ ') |
+      \ exec "set path-=".s:tempPath |
+      \ exec "set path-=".s:default_path |
+      \ exec "set path^=".s:tempPath |
+      \ exec "set path^=".s:default_path
+
+
+" Haskell Lint
+let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['haskell'] }
+nmap <silent> <leader>hl :SyntasticCheck hlint<CR>
+
+" Hoogle the word under the cursor
+nnoremap <silent> <leader>hh :Hoogle<CR>
+
+" Hoogle and prompt for input
+nnoremap <leader>hH :Hoogle 
+
+" Hoogle for detailed documentation (e.g. "Functor")
+nnoremap <silent> <leader>hi :HoogleInfo<CR>
+
+" Hoogle for detailed documentation and prompt for input
+nnoremap <leader>hI :HoogleInfo 
+
+" Hoogle, close the Hoogle window
+nnoremap <silent> <leader>hz :HoogleClose<CR>
+
+" }}}
+
+" Alignment {{{
+
+" Stop Align plugin from forcing its mappings on us
+let g:loaded_AlignMapsPlugin=1
+" Align on equal signs
+map <Leader>a= :Align =<CR>
+" Align on commas
+map <Leader>a, :Align ,<CR>
+" Align on pipes
+map <Leader>a<bar> :Align <bar><CR>
+" Prompt for align character
+map <leader>ap :Align
+
+" Enable some tabular presets for Haskell
+let g:haskell_tabular = 1
+
+" }}}
+
+" Tags {{{
+
+set tags=tags;/,codex.tags;/
+
+let g:tagbar_type_haskell = {
+    \ 'ctagsbin'  : 'hasktags',
+    \ 'ctagsargs' : '-x -c -o-',
+    \ 'kinds'     : [
+        \  'm:modules:0:1',
+        \  'd:data: 0:1',
+        \  'd_gadt: data gadt:0:1',
+        \  't:type names:0:1',
+        \  'nt:new types:0:1',
+        \  'c:classes:0:1',
+        \  'cons:constructors:1:1',
+        \  'c_gadt:constructor gadt:1:1',
+        \  'c_a:constructor accessors:1:1',
+        \  'ft:function types:1:1',
+        \  'fi:function implementations:0:1',
+        \  'o:others:0:1'
+    \ ],
+    \ 'sro'        : '.',
+    \ 'kind2scope' : {
+        \ 'm' : 'module',
+        \ 'c' : 'class',
+        \ 'd' : 'data',
+        \ 't' : 'type'
+    \ },
+    \ 'scope2kind' : {
+        \ 'module' : 'm',
+        \ 'class'  : 'c',
+        \ 'data'   : 'd',
+        \ 'type'   : 't'
+    \ }
+\ }
+
+" Generate haskell tags with codex and hscope
+map <leader>tg :!codex update --force<CR>:call system("git hscope -X TemplateHaskell")<CR><CR>:call LoadHscope()<CR>
+
+map <leader>tt :TagbarToggle<CR>
+
+set csprg=~/.cabal/bin/hscope
+set csto=1 " search codex tags first
+set cst
+set csverb
+nnoremap <silent> <C-\> :cs find c <C-R>=expand("<cword>")<CR><CR>
+" Automatically make cscope connections
+function! LoadHscope()
+  let db = findfile("hscope.out", ".;")
+  if (!empty(db))
+    let path = strpart(db, 0, match(db, "/hscope.out$"))
+    set nocscopeverbose " suppress 'duplicate connection' error
+    exe "cs add " . db . " " . path
+    set cscopeverbose
+  endif
+endfunction
+au BufEnter /*.hs call LoadHscope()
+
+" }}}
